@@ -99,7 +99,7 @@
         <section class="setting-group">
           <div class="group-header">
             <h2 class="group-title">语音 Provider</h2>
-            <button class="add-btn" @click="showAddVoiceProvider = true">
+            <button class="add-btn" @click="openAddVoiceProvider">
               <van-icon name="plus" size="16" />
             </button>
           </div>
@@ -116,14 +116,17 @@
                 <span class="provider-name">{{ provider.name }}</span>
                 <span class="provider-model">{{ provider.model }} · {{ provider.voice }}</span>
               </div>
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  :checked="provider.enabled"
-                  @change="toggleVoiceProvider(provider)"
-                />
-                <span class="slider"></span>
-              </label>
+              <div class="provider-actions">
+                <button class="action-btn" @click="editVoiceProvider(provider)">编辑</button>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    :checked="provider.enabled"
+                    @change="toggleVoiceProvider(provider)"
+                  />
+                  <span class="slider"></span>
+                </label>
+              </div>
             </div>
           </div>
         </section>
@@ -203,6 +206,56 @@
         </div>
       </div>
     </teleport>
+
+    <!-- 添加/编辑语音 Provider 弹窗 -->
+    <teleport to="body">
+      <div v-if="showAddVoiceProvider" class="custom-popup-overlay" @click.self="closeVoicePopup">
+        <div class="custom-popup">
+          <div class="popup-header">
+            <h3 class="popup-title">{{ editingVoiceProvider ? '编辑' : '添加' }}语音 Provider</h3>
+            <button class="popup-close" @click="closeVoicePopup" aria-label="关闭">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="popup-body">
+            <div class="form-item">
+              <label>名称</label>
+              <input v-model="voiceProviderForm.name" :disabled="editingVoiceProvider" placeholder="provider 名称" />
+            </div>
+            <div class="form-item">
+              <label>API Base</label>
+              <input v-model="voiceProviderForm.api_base" placeholder="https://open.bigmodel.cn/api/paas/v4" />
+            </div>
+            <div class="form-item">
+              <label>API Key</label>
+              <input v-model="voiceProviderForm.api_key" type="password" placeholder="sk-..." />
+            </div>
+            <div class="form-item">
+              <label>模型</label>
+              <input v-model="voiceProviderForm.model" placeholder="glm-tts" />
+            </div>
+            <div class="form-item">
+              <label>音色</label>
+              <input v-model="voiceProviderForm.voice" placeholder="female" />
+            </div>
+            <div class="form-item">
+              <label>语速</label>
+              <input v-model.number="voiceProviderForm.speed" type="number" step="0.1" min="0.5" max="2" placeholder="1.0" />
+            </div>
+            <div class="form-item">
+              <label>音量</label>
+              <input v-model.number="voiceProviderForm.volume" type="number" step="0.1" min="0.5" max="2" placeholder="1.0" />
+            </div>
+          </div>
+          <div class="popup-actions">
+            <button class="btn-cancel" @click="closeVoicePopup">取消</button>
+            <button class="btn-confirm" @click="saveVoiceProvider">保存</button>
+          </div>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
@@ -241,6 +294,19 @@ const providerForm = ref({
 // 语音 Provider
 const voiceProviders = ref([])
 const showAddVoiceProvider = ref(false)
+const editingVoiceProvider = ref(null)
+const voiceProviderForm = ref({
+  name: '',
+  api_base: '',
+  api_key: '',
+  model: 'glm-tts',
+  voice: 'female',
+  enabled: true,
+  response_format: 'pcm',
+  encode_format: 'base64',
+  speed: 1.0,
+  volume: 1.0
+})
 
 // 语音设置
 const bargeInEnabled = ref(true)
@@ -408,6 +474,77 @@ async function toggleVoiceProvider(provider) {
   } catch (e) {
     console.error('切换语音 Provider 失败:', e)
     showFailToast('操作失败')
+  }
+}
+
+function editVoiceProvider(provider) {
+  editingVoiceProvider.value = provider
+  voiceProviderForm.value = { ...provider }
+  showAddVoiceProvider.value = true
+}
+
+function openAddVoiceProvider() {
+  editingVoiceProvider.value = null
+  voiceProviderForm.value = {
+    name: '',
+    api_base: '',
+    api_key: '',
+    model: 'glm-tts',
+    voice: 'female',
+    enabled: true,
+    response_format: 'pcm',
+    encode_format: 'base64',
+    speed: 1.0,
+    volume: 1.0
+  }
+  showAddVoiceProvider.value = true
+}
+
+function closeVoicePopup() {
+  showAddVoiceProvider.value = false
+  editingVoiceProvider.value = null
+  voiceProviderForm.value = {
+    name: '',
+    api_base: '',
+    api_key: '',
+    model: 'glm-tts',
+    voice: 'female',
+    enabled: true,
+    response_format: 'pcm',
+    encode_format: 'base64',
+    speed: 1.0,
+    volume: 1.0
+  }
+}
+
+async function saveVoiceProvider() {
+  // 验证表单
+  if (!voiceProviderForm.value.name.trim()) {
+    showFailToast('请输入 Provider 名称')
+    return
+  }
+  if (!voiceProviderForm.value.api_base.trim()) {
+    showFailToast('请输入 API Base')
+    return
+  }
+  if (!voiceProviderForm.value.model.trim()) {
+    showFailToast('请输入模型名称')
+    return
+  }
+
+  try {
+    if (editingVoiceProvider.value) {
+      await voiceApi.updateVoiceProvider(voiceProviderForm.value.name, voiceProviderForm.value)
+      showSuccessToast('语音 Provider 已更新')
+    } else {
+      await voiceApi.createVoiceProvider(voiceProviderForm.value)
+      showSuccessToast('语音 Provider 已添加')
+    }
+    closeVoicePopup()
+    await loadProviders()
+  } catch (e) {
+    console.error('保存语音 Provider 失败:', e)
+    showFailToast('保存失败: ' + (e.message || '未知错误'))
   }
 }
 </script>
