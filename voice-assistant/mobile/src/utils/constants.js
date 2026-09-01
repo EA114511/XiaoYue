@@ -11,10 +11,10 @@ export const API_CONFIG = {
 // 唤醒词
 export const WAKE_WORDS = ['小玥小玥', '小月小月', '小悦小悦']
 
-// 存储键名
+// 存储键名（仅用于非敏感数据）
 export const STORAGE_KEYS = {
-  NAS_URL: 'xiaoyue_nas_url',
-  API_TOKEN: 'xiaoyue_api_token',
+  // NAS 地址和 API Token 不再存储到 localStorage
+  // 使用会话级内存存储，页面刷新后需重新输入
   USER_ID: 'xiaoyue_user_id'
 }
 
