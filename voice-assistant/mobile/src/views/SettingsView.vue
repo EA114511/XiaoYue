@@ -170,8 +170,11 @@
     <van-popup
       v-model:show="showAddProvider"
       position="bottom"
+      teleport="body"
       :style="{ background: 'var(--ink-1)' }"
       round
+      closeable
+      @close="closePopup"
     >
       <div class="popup-content">
         <h3 class="popup-title">{{ editingProvider ? '编辑' : '添加' }} LLM Provider</h3>
@@ -220,6 +223,7 @@ const loading = ref(false)
 // LLM Provider
 const llmProviders = ref([])
 const currentProvider = ref('')
+// 确保弹窗默认关闭
 const showAddProvider = ref(false)
 const editingProvider = ref(null)
 const providerForm = ref({
