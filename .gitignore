@@ -30,9 +30,9 @@ frontend/.cache/
 *.key
 
 # Runtime data / logs
-backend/data/*.json
-backend/data/*.db
-backend/logs/
+**/backend/data/*.json
+**/backend/data/*.db
+**/backend/logs/
 *.log
 *.sqlite
 *.sqlite3
