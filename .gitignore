@@ -57,3 +57,16 @@ Thumbs.db
 
 # Backup / Old versions (keep docs but ignore generated artifacts)
 _backup_original_frontend/
+
+# Development images
+img/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+!voice-assistant/frontend/src/assets/**/*.png
+!voice-assistant/frontend/src/assets/**/*.jpg
+!voice-assistant/frontend/src/assets/**/*.svg
+!voice-assistant/frontend/assets/*.png
+!voice-assistant/mobile/assets/*.png
