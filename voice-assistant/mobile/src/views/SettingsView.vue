@@ -64,7 +64,7 @@
         <section class="setting-group">
           <div class="group-header">
             <h2 class="group-title">LLM Provider</h2>
-            <button class="add-btn" @click="showAddProvider = true">
+            <button class="add-btn" @click="openAddProvider">
               <van-icon name="plus" size="16" />
             </button>
           </div>
@@ -192,7 +192,7 @@
           <input v-model="providerForm.model" placeholder="gpt-3.5-turbo" />
         </div>
         <div class="popup-actions">
-          <button class="btn-cancel" @click="showAddProvider = false">取消</button>
+          <button class="btn-cancel" @click="closePopup">取消</button>
           <button class="btn-confirm" @click="saveProvider">保存</button>
         </div>
       </div>
@@ -203,6 +203,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { showToast, showSuccessToast, showFailToast } from 'vant'
 import { useAppStore } from '@/stores'
 import { voiceApi, setBaseUrl, setSessionApiToken, clearSessionApiToken } from '@/api'
 import NightSky from '@/components/NightSky.vue'
@@ -248,6 +249,11 @@ function handleKeydown(e) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  nasUrl.value = store.nasUrl
+  // 延迟检查连接，避免页面加载时闪烁
+  setTimeout(() => {
+    checkConnection()
+  }, 100)
 })
 
 onUnmounted(() => {
@@ -259,18 +265,23 @@ function goBack() {
 }
 
 async function saveNasUrl() {
-  if (nasUrl.value.startsWith('http')) {
-    setBaseUrl(nasUrl.value)
-    await checkConnection()
+  if (!nasUrl.value.startsWith('http')) {
+    showFailToast('请输入正确的 URL，以 http:// 或 https:// 开头')
+    return
   }
+  setBaseUrl(nasUrl.value)
+  showSuccessToast('已保存')
+  await checkConnection()
 }
 
 function saveApiToken() {
   // 存储到会话，不保存到 localStorage
   if (apiToken.value) {
     setSessionApiToken(apiToken.value)
+    showSuccessToast('API Token 已设置')
   } else {
     clearSessionApiToken()
+    showToast('API Token 已清除')
   }
 }
 
@@ -279,9 +290,11 @@ async function checkConnection() {
   try {
     await voiceApi.health()
     isConnected.value = true
+    showSuccessToast('连接成功')
     await loadProviders()
   } catch (e) {
     isConnected.value = false
+    showFailToast('连接失败，请检查地址')
     console.error('连接失败:', e)
   } finally {
     loading.value = false
@@ -302,6 +315,7 @@ async function loadProviders() {
     currentProvider.value = settings.dialog_provider_name || settings.nlu_provider_name || 'default'
   } catch (e) {
     console.error('加载 Provider 失败:', e)
+    showFailToast('加载配置失败')
   }
 }
 
@@ -311,44 +325,84 @@ function editProvider(provider) {
   showAddProvider.value = true
 }
 
+function openAddProvider() {
+  editingProvider.value = null
+  providerForm.value = {
+    name: '',
+    api_base: '',
+    api_key: '',
+    model: '',
+    max_tokens: 2048,
+    temperature: 0.7
+  }
+  showAddProvider.value = true
+}
+
+function closePopup() {
+  showAddProvider.value = false
+  editingProvider.value = null
+  providerForm.value = {
+    name: '',
+    api_base: '',
+    api_key: '',
+    model: '',
+    max_tokens: 2048,
+    temperature: 0.7
+  }
+}
+
 async function saveProvider() {
+  // 验证表单
+  if (!providerForm.value.name.trim()) {
+    showFailToast('请输入 Provider 名称')
+    return
+  }
+  if (!providerForm.value.api_base.trim()) {
+    showFailToast('请输入 API Base')
+    return
+  }
+  if (!providerForm.value.model.trim()) {
+    showFailToast('请输入模型名称')
+    return
+  }
+
   try {
     if (editingProvider.value) {
       await voiceApi.updateProvider(providerForm.value.name, providerForm.value)
+      showSuccessToast('Provider 已更新')
     } else {
       await voiceApi.createProvider(providerForm.value)
+      showSuccessToast('Provider 已添加')
     }
-    showAddProvider.value = false
-    editingProvider.value = null
-    providerForm.value = { name: '', api_base: '', api_key: '', model: '', max_tokens: 2048, temperature: 0.7 }
-    loadProviders()
+    closePopup()
+    await loadProviders()
   } catch (e) {
     console.error('保存 Provider 失败:', e)
+    showFailToast('保存失败: ' + (e.message || '未知错误'))
   }
 }
 
 async function deleteProvider(name) {
   try {
     await voiceApi.deleteProvider(name)
-    loadProviders()
+    showSuccessToast('Provider 已删除')
+    await loadProviders()
   } catch (e) {
     console.error('删除 Provider 失败:', e)
+    showFailToast('删除失败')
   }
 }
 
 async function toggleVoiceProvider(provider) {
   try {
     await voiceApi.updateVoiceProvider(provider.name, { enabled: !provider.enabled })
-    loadProviders()
+    showSuccessToast(provider.enabled ? '已禁用' : '已启用')
+    await loadProviders()
   } catch (e) {
     console.error('切换语音 Provider 失败:', e)
+    showFailToast('操作失败')
   }
 }
-
-onMounted(() => {
-  nasUrl.value = store.nasUrl
-  checkConnection()
-})
 </script>
 
 <style scoped>
