@@ -63,6 +63,13 @@ export function useVoiceChat(options = {}) {
 
   /** 获取当前服务器地址 */
   function getServerUrl() {
+    // 优先使用用户配置的 NAS 地址（保存到 localStorage）
+    const savedNasUrl = localStorage.getItem('xiaoyue_nas_url')
+    if (savedNasUrl) {
+      // 将 http://nas-ip:8000 转换为 ws://nas-ip:8000/ws/voice
+      const wsUrl = savedNasUrl.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws/voice'
+      return wsUrl
+    }
     return serverUrlRef.value
   }
 

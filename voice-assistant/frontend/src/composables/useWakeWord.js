@@ -20,7 +20,15 @@ export function useWakeWord({ onWake, wakeWords = ['小玥小玥', '小月小月
   let enabled = true
 
   function isSupported() {
-    return !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+    const supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+    if (!supported) {
+      console.warn('[useWakeWord] 当前环境不支持唤醒词，将降级为按住说话')
+      // Android WebView 中 SpeechRecognition 通常不可用
+      if (navigator.userAgent.includes('Android')) {
+        console.warn('[useWakeWord] Android WebView 环境，唤醒词功能不可用')
+      }
+    }
+    return supported
   }
 
   function createRecognition() {

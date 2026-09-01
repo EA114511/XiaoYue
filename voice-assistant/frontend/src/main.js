@@ -3,6 +3,16 @@ import App from './App.vue'
 import './assets/styles/main.css'
 
 // ============================================================
+// Capacitor 环境检测
+// ============================================================
+import { Capacitor } from '@capacitor/core'
+
+if (Capacitor.isNativePlatform()) {
+  document.body.classList.add('capacitor-android')
+  console.log('[小玥] 运行在 Android App 中')
+}
+
+// ============================================================
 // 全局 fetch 包装：给所有请求自动附加 X-API-Token 鉴权头
 // 后端对写操作（POST/PATCH/DELETE）校验该 Token，避免逐个调用点修改
 // ============================================================

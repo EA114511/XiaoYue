@@ -1,6 +1,7 @@
 # ====================================
 # Docker Compose - AI语音助手
 # 包含 backend 和 frontend 两个服务
+# 适配绿联云 NAS 4800 部署
 # ====================================
 version: '3.8'
 
@@ -21,10 +22,10 @@ services:
       - DEBUG=false
       - DATABASE_URL=sqlite:///./data/voice_assistant.db
     volumes:
-      # 开发模式挂载源码（热重载），生产环境可移除
-      - ./backend:/app
       # 持久化数据库文件
       - backend_data:/app/data
+      # 日志目录挂载到宿主机，便于查看
+      - ./backend/logs:/app/logs
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
@@ -34,23 +35,26 @@ services:
       start_period: 15s
     networks:
       - voice-assistant-net
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
 
-  # ========== 前端服务 (React + Vite) ==========
+  # ========== 前端服务 (Vue 3 + Nginx) ==========
+  # 可选：用于局域网 Web 浏览器访问
+  # Android App 使用内置前端，可不部署此服务
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: voice-assistant-frontend
     ports:
-      - '5173:5173'
+      - '3000:80'
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000
-      - VITE_WS_URL=ws://localhost:8000/ws/voice
-    volumes:
-      # 开发模式挂载源码
-      - ./frontend:/app
-      # 避免 node_modules 被宿主覆盖
-      - /app/node_modules
+      - VITE_API_BASE_URL=http://nas-ip:8000
+      - VITE_WS_URL=ws://nas-ip:8000/ws/voice
     depends_on:
       backend:
         condition: service_healthy

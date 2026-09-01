@@ -1,0 +1,22 @@
+{
+  "appId": "com.xiaoyue.voice",
+  "appName": "小玥",
+  "webDir": "dist",
+  "server": {
+    "url": "http://192.168.5.5:8000",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#090C14",
+      "showSpinner": false,
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    }
+  }
+}
