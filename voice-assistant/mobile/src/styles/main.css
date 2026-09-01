@@ -1,0 +1,133 @@
+/* ====================================
+   小玥 AI 语音助手 — 移动端「月夜·明珠」主题
+   继承网页版设计 Token，针对移动端优化
+   ==================================== */
+
+@import 'vant/lib/index.css';
+
+/* ---------- 设计 Token ---------- */
+:root {
+  /* 色彩 —— 墨蓝 + 月光暖金 + 青瓷 */
+  --ink-0: #090C14;
+  --ink-1: #0D1220;
+  --ink-2: #12182A;
+  --ink-3: #1B2340;
+  --gold: #E4B56A;
+  --gold-2: #F3D9A4;
+  --celadon: #9FD4CB;
+  --pearl: #EFE7D3;
+  --pearl-dim: #B9B3A2;
+  --mist: #7E8EA6;
+  --faint: #4C5872;
+
+  /* 透明度变体 */
+  --gold-glow: rgba(228, 181, 106, 0.16);
+  --hair-warm: rgba(228, 181, 106, 0.14);
+  --hair-cool: rgba(126, 142, 166, 0.12);
+
+  /* Vant 主题定制 */
+  --van-primary-color: var(--gold);
+  --van-background: var(--ink-0);
+  --van-background-2: var(--ink-1);
+  --van-text-color: var(--pearl);
+  --van-text-color-2: var(--pearl-dim);
+  --van-border-color: var(--hair-cool);
+
+  /* 移动端特有 */
+  --orb-size: 160px;
+  --button-size: 72px;
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---------- 全局重置 ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--ink-0);
+  color: var(--pearl);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+               'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ---------- 安全区适配 ---------- */
+.safe-area-top {
+  padding-top: var(--safe-area-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* ---------- Vant 组件暗色主题覆盖 ---------- */
+.van-nav-bar {
+  background: var(--ink-0);
+  border-bottom: 1px solid var(--hair-cool);
+}
+
+.van-nav-bar__title {
+  color: var(--pearl);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.van-nav-bar .van-icon {
+  color: var(--mist);
+}
+
+.van-button--primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink-0);
+}
+
+.van-button--plain {
+  background: transparent;
+  border-color: var(--hair-warm);
+  color: var(--gold);
+}
+
+/* ---------- 通用类 ---------- */
+.text-center { text-align: center; }
+.text-gold { color: var(--gold); }
+.text-celadon { color: var(--celadon); }
+.text-mist { color: var(--mist); }
+.text-faint { color: var(--faint); }
+
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-column { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ink-3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
