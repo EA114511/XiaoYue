@@ -167,39 +167,42 @@
     </div>
 
     <!-- 添加/编辑 Provider 弹窗 -->
-    <van-popup
-      v-model:show="showAddProvider"
-      position="bottom"
-      teleport="body"
-      :style="{ background: 'var(--ink-1)' }"
-      round
-      closeable
-      @close="closePopup"
-    >
-      <div class="popup-content">
-        <h3 class="popup-title">{{ editingProvider ? '编辑' : '添加' }} LLM Provider</h3>
-        <div class="form-item">
-          <label>名称</label>
-          <input v-model="providerForm.name" :disabled="editingProvider" placeholder="provider 名称" />
-        </div>
-        <div class="form-item">
-          <label>API Base</label>
-          <input v-model="providerForm.api_base" placeholder="https://api.example.com/v1" />
-        </div>
-        <div class="form-item">
-          <label>API Key</label>
-          <input v-model="providerForm.api_key" type="password" placeholder="sk-..." />
-        </div>
-        <div class="form-item">
-          <label>模型</label>
-          <input v-model="providerForm.model" placeholder="gpt-3.5-turbo" />
-        </div>
-        <div class="popup-actions">
-          <button class="btn-cancel" @click="closePopup">取消</button>
-          <button class="btn-confirm" @click="saveProvider">保存</button>
+    <teleport to="body">
+      <div v-if="showAddProvider" class="custom-popup-overlay" @click.self="closePopup">
+        <div class="custom-popup">
+          <div class="popup-header">
+            <h3 class="popup-title">{{ editingProvider ? '编辑' : '添加' }} LLM Provider</h3>
+            <button class="popup-close" @click="closePopup" aria-label="关闭">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="popup-body">
+            <div class="form-item">
+              <label>名称</label>
+              <input v-model="providerForm.name" :disabled="editingProvider" placeholder="provider 名称" />
+            </div>
+            <div class="form-item">
+              <label>API Base</label>
+              <input v-model="providerForm.api_base" placeholder="https://api.example.com/v1" />
+            </div>
+            <div class="form-item">
+              <label>API Key</label>
+              <input v-model="providerForm.api_key" type="password" placeholder="sk-..." />
+            </div>
+            <div class="form-item">
+              <label>模型</label>
+              <input v-model="providerForm.model" placeholder="gpt-3.5-turbo" />
+            </div>
+          </div>
+          <div class="popup-actions">
+            <button class="btn-cancel" @click="closePopup">取消</button>
+            <button class="btn-confirm" @click="saveProvider">保存</button>
+          </div>
         </div>
       </div>
-    </van-popup>
+    </teleport>
   </div>
 </template>
 
@@ -731,16 +734,61 @@ async function toggleVoiceProvider(provider) {
   background: var(--ink-0);
 }
 
-/* ---------- 弹窗 ---------- */
-:deep(.van-popup) {
-  max-height: 90vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+/* ---------- 自定义弹窗 ---------- */
+.custom-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(9, 12, 20, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  animation: fade-in 0.2s ease;
 }
 
-.popup-content {
-  padding: 24px 20px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.custom-popup {
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  background: var(--ink-1);
+  border: 1px solid var(--hair-cool);
+  border-radius: 20px;
+  overflow: hidden;
+  animation: slide-up 0.3s ease;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid var(--hair-cool);
 }
 
 .popup-title {
@@ -748,8 +796,34 @@ async function toggleVoiceProvider(provider) {
   font-size: 18px;
   font-weight: 600;
   color: var(--pearl);
-  margin: 0 0 20px;
-  text-align: center;
+  margin: 0;
+}
+
+.popup-close {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--mist);
+  transition: all 0.25s ease;
+}
+
+.popup-close:active {
+  background: rgba(228, 181, 106, 0.1);
+  color: var(--gold);
+}
+
+.popup-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.popup-body {
+  padding: 20px;
+  max-height: 50vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .form-item {
@@ -790,7 +864,9 @@ async function toggleVoiceProvider(provider) {
 .popup-actions {
   display: flex;
   gap: 12px;
-  margin-top: 24px;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hair-cool);
 }
 
 .btn-cancel,
@@ -806,6 +882,10 @@ async function toggleVoiceProvider(provider) {
 .btn-cancel {
   background: transparent;
   color: var(--mist);
+}
+
+.btn-cancel:active {
+  background: rgba(126, 142, 166, 0.1);
 }
 
 .btn-confirm {
