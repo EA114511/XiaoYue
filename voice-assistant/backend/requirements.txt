@@ -1,0 +1,40 @@
+# === FastAPI Web框架 ===
+fastapi==0.138.0
+uvicorn[standard]==0.27.0
+websockets==12.0
+python-multipart==0.0.6
+
+# === HTTP客户端 ===
+httpx==0.26.0
+
+# === 加密 ===
+cryptography==41.0.7
+
+# === OpenAI API ===
+openai==1.12.0
+
+# === 语音识别 (ASR) ===
+# openai-whisper: OpenAI 通用语音识别模型
+openai-whisper==20231117
+# webrtcvad: WebRTC 语音活动检测（VAD），用于检测人声起止
+webrtcvad==2.0.10
+
+# === 数值计算 ===
+numpy==1.26.3
+scipy==1.12.0
+
+# === 数据库 ===
+sqlalchemy[asyncio]==2.0.27
+aiosqlite==0.19.0
+alembic==1.13.1
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+aiofiles==23.2.1
+
+# === 智能上下文压缩（headroom-ai，节省 60-95% LLM Token） ===
+headroom-ai>=0.27.0
+
+# === 测试 ===
+pytest==8.0.0
+pytest-asyncio==0.23.3

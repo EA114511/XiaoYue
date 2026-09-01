@@ -1,0 +1,10 @@
+{
+  "name": "xiaoyue-redesign-mockup",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "小玥 AI 语音助手 — 界面重设计高保真设计稿",
+  "scripts": {
+    "dev": "node server.mjs"
+  }
+}

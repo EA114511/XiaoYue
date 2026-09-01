@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+frontend/dist/
+frontend/.cache/
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime data / logs
+backend/data/*.json
+backend/data/*.db
+backend/logs/
+*.log
+*.sqlite
+*.sqlite3
+
+# IDE / OS
+.vscode/
+.idea/
+.trae/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Backup / Old versions (keep docs but ignore generated artifacts)
+_backup_original_frontend/

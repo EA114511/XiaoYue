@@ -1,0 +1,277 @@
+/* ══════════════════════════════════════════════════════════════
+   小玥 AI 助手 — 全局样式 & 设计系统 Tokens
+   概念：「月夜 · 明珠」（单暗色主题）
+   深潭墨蓝为底，月光暖金为魂，青瓷冷绿为客。
+   ══════════════════════════════════════════════════════════════ */
+
+/* ---------- Tokens ---------- */
+:root {
+  /* 底色：深潭墨蓝（微暖，非纯黑） */
+  --ink-0: #090c14;
+  --ink-1: #0d1220;
+  --ink-2: #141b2e;
+  --ink-3: #1b2340;
+
+  /* 月光暖金：助手之声 */
+  --gold: #e4b56a;
+  --gold-2: #f3d9a4;
+  --gold-3: #8a6a35;
+  --gold-glow: rgba(228, 181, 106, 0.35);
+
+  /* 青瓷冷绿：用户之声 */
+  --celadon: #9fd4cb;
+  --celadon-dim: rgba(159, 212, 203, 0.55);
+
+  /* 文本 */
+  --pearl: #efe7d3;          /* 暖白，正文主色 */
+  --pearl-dim: #b9b3a2;
+  --mist: #7e8ea6;           /* 冷灰蓝，次级信息 */
+  --faint: #4c5872;
+
+  /* 发丝线 */
+  --hair-warm: rgba(228, 181, 106, 0.16);
+  --hair-cool: rgba(148, 170, 200, 0.12);
+
+  /* 材质 */
+  --glass: rgba(16, 21, 38, 0.62);
+  --glass-2: rgba(22, 28, 50, 0.55);
+
+  /* 字体 */
+  --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --latin: "Cormorant Garamond", "Noto Serif SC", serif;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.21, 1);
+
+  /* ============================================================
+     兼容别名 — 供 VoiceConfig 等存量组件继续引用旧 token 名
+     （全部映射到月夜暗色系）
+     ============================================================ */
+  --bg-primary: var(--ink-1);
+  --bg-secondary: var(--ink-2);
+  --bg-tertiary: var(--ink-3);
+  --bg-hover: rgba(239, 231, 211, 0.06);
+  --bg-active: rgba(239, 231, 211, 0.1);
+  --bg-elevated: var(--ink-3);
+  --bg-overlay: rgba(5, 7, 12, 0.72);
+  --bg-chat-hover: var(--ink-2);
+  --bg-sidebar: rgba(11, 15, 26, 0.92);
+
+  --text-primary: var(--pearl);
+  --text-secondary: var(--pearl-dim);
+  --text-tertiary: var(--mist);
+  --text-quaternary: var(--faint);
+  --text-inverse: var(--ink-0);
+
+  --border-color: var(--hair-cool);
+  --border-light: rgba(148, 170, 200, 0.08);
+  --border-focus: var(--gold);
+
+  --accent-primary: var(--gold);
+  --accent-primary-hover: var(--gold-2);
+  --accent-primary-active: var(--gold-3);
+  --accent-primary-light: rgba(228, 181, 106, 0.12);
+  --accent-secondary: var(--mist);
+  --accent-green: var(--celadon);
+  --accent-green-light: rgba(159, 212, 203, 0.12);
+  --accent-red: var(--gold);
+  --accent-red-light: rgba(228, 181, 106, 0.12);
+  --accent-orange: var(--gold-2);
+  --accent-orange-light: rgba(243, 217, 164, 0.12);
+
+  --warning-color: var(--gold-2);
+  --success-color: var(--celadon);
+
+  /* 间距系统（4px 基准） */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+  --space-5xl: 48px;
+
+  /* 排版系统 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* 圆角系统 */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-full: 9999px;
+
+  /* 阴影系统（夜色加深） */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  /* 动画系统 */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.35s;
+  --transition-fast: 0.15s var(--ease);
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* 尺寸 */
+  --header-height: 72px;
+  --input-min-height: 44px;
+  --sidebar-width: 300px;
+  --content-max-width: 1440px;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--sans);
+  line-height: 1.6;
+  background: var(--ink-0);
+  color: var(--pearl);
+  overflow: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+::selection {
+  background: rgba(228, 181, 106, 0.28);
+  color: var(--pearl);
+}
+
+/* ---------- 滚动条美化 ---------- */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
+}
+
+/* ---------- 环境层：aurora / grain（照抄设计稿） ---------- */
+.aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 30% at 22% 78%, rgba(228, 181, 106, 0.07), transparent 70%),
+    radial-gradient(42% 34% at 82% 18%, rgba(84, 110, 180, 0.09), transparent 70%),
+    radial-gradient(30% 26% at 68% 88%, rgba(159, 212, 203, 0.04), transparent 70%);
+  animation: aurora-drift 90s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1.2%, 0) scale(1.04);
+  }
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1024px) {
+  body {
+    overflow: auto;
+  }
+}
+
+/* ---------- 减少动态（无障碍） ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

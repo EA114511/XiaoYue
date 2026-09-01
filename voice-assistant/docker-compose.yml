@@ -1,0 +1,68 @@
+# ====================================
+# Docker Compose - AI语音助手
+# 包含 backend 和 frontend 两个服务
+# ====================================
+version: '3.8'
+
+services:
+  # ========== 后端服务 (FastAPI) ==========
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: voice-assistant-backend
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./backend/.env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      - DATABASE_URL=sqlite:///./data/voice_assistant.db
+    volumes:
+      # 开发模式挂载源码（热重载），生产环境可移除
+      - ./backend:/app
+      # 持久化数据库文件
+      - backend_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - voice-assistant-net
+
+  # ========== 前端服务 (React + Vite) ==========
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: voice-assistant-frontend
+    ports:
+      - '5173:5173'
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000/ws/voice
+    volumes:
+      # 开发模式挂载源码
+      - ./frontend:/app
+      # 避免 node_modules 被宿主覆盖
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - voice-assistant-net
+
+networks:
+  voice-assistant-net:
+    name: voice-assistant-network
+    driver: bridge
+
+volumes:
+  backend_data:
+    name: voice-assistant-backend-data

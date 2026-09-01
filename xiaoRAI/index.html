@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>小玥 · 语音助手 — 界面重设计</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-state="idle">
+
+  <!-- ══════════ 环境层：夜色、星野、颗粒 ══════════ -->
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ══════════ 顶栏 ══════════ -->
+  <header class="topbar">
+    <div class="brand" data-anno="1">
+      <span class="brand-seal">玥</span>
+      <div class="brand-text">
+        <h1>小玥</h1>
+        <span class="brand-sub">XIAOYUE&nbsp;·&nbsp;VOICE&nbsp;ASSISTANT</span>
+      </div>
+    </div>
+
+    <div class="top-meta">
+      <span class="model-chip local" id="modelChip" data-anno="2">
+        <i class="chip-dot"></i><span id="modelText">本地&nbsp;·&nbsp;Qwen2.5</span>
+      </span>
+      <button class="icon-btn" title="对话历史" aria-label="对话历史">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+      </button>
+      <button class="icon-btn" title="设置" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════ 主区域：左舞台 · 右对话流 ══════════ -->
+  <main class="layout">
+
+    <!-- 舞台：玥珠 -->
+    <section class="stage">
+      <div class="orb-wrap" data-anno="3">
+        <canvas id="orb"></canvas>
+        <div class="orb-halo" aria-hidden="true"></div>
+      </div>
+
+      <div class="state-line" data-anno="4">
+        <span class="state-verb" id="stateVerb">待机</span>
+        <span class="state-rule" aria-hidden="true"></span>
+        <span class="state-sub" id="stateSub">STANDBY</span>
+      </div>
+
+      <p class="caption" id="caption" data-anno="5">轻触麦克风，或按住空格开始说话</p>
+
+      <div class="dock" data-anno="6">
+        <button class="mic" id="micBtn" aria-label="按住说话">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          <span class="mic-ring" aria-hidden="true"></span>
+        </button>
+        <input class="dock-input" type="text" placeholder="说点什么，或输入文字…" aria-label="输入消息" />
+        <button class="send" aria-label="发送">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </div>
+      <p class="dock-hint">按住 <kbd>空格</kbd> 说话&ensp;·&ensp;<kbd>Enter</kbd> 发送</p>
+    </section>
+
+    <!-- 对话流 -->
+    <aside class="stream" data-anno="7">
+      <div class="stream-head">
+        <h2>对话</h2>
+        <span class="stream-meta">今天&ensp;·&ensp;16:24</span>
+        <button class="text-btn">清空</button>
+      </div>
+
+      <div class="stream-scroll" id="streamScroll">
+
+        <!-- 用户语音 -->
+        <article class="msg user">
+          <div class="msg-body">
+            <button class="voice-pill" data-dur="4" aria-label="播放语音 4 秒">
+              <svg class="vp-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="9,6 19,12 9,18"/></svg>
+              <span class="vp-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="vp-dur">4″</span>
+            </button>
+            <p class="msg-text">今天北京的天气怎么样？</p>
+            <span class="msg-time">16:21</span>
+          </div>
+        </article>
+
+        <!-- 小玥语音回复 -->
+        <article class="msg assistant">
+          <div class="msg-avatar"><span class="seal">玥</span></div>
+          <div class="msg-body">
+            <button class="voice-pill playing" data-dur="9" aria-label="播放语音 9 秒">
+              <svg class="vp-play" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="6" width="3.4" height="12" rx="1"/><rect x="13.6" y="6" width="3.4" height="12" rx="1"/></svg>
+              <span class="vp-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="vp-dur">9″</span>
+            </button>
+            <p class="msg-text">北京今天晴，气温 18 到 26 度，北风二级。傍晚有些凉，出门记得带件薄外套。</p>
+            <span class="msg-time">16:21</span>
+          </div>
+        </article>
+
+        <!-- 用户文字 -->
+        <article class="msg user">
+          <div class="msg-body">
+            <p class="msg-text">帮我把「小玥」翻译成英文，要信达雅。</p>
+            <span class="msg-time">16:23</span>
+          </div>
+        </article>
+
+        <!-- 智能体回复 -->
+        <article class="msg assistant">
+          <div class="msg-avatar"><span class="seal agent">译</span></div>
+          <div class="msg-body">
+            <span class="agent-tag">翻译官</span>
+            <p class="msg-text">可以译作 <em class="latin">Lumina</em> —— 取「月光之珠」的意象，既保留「玥」的珠宝感，又带一层清辉。若偏口语，<em class="latin">Luna</em> 也很贴切。</p>
+            <span class="msg-time">16:23</span>
+          </div>
+        </article>
+
+        <!-- 用户语音 2 -->
+        <article class="msg user">
+          <div class="msg-body">
+            <button class="voice-pill" data-dur="2" aria-label="播放语音 2 秒">
+              <svg class="vp-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="9,6 19,12 9,18"/></svg>
+              <span class="vp-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="vp-dur">2″</span>
+            </button>
+            <p class="msg-text">很好，就叫这个吧。</p>
+            <span class="msg-time">16:24</span>
+          </div>
+        </article>
+
+        <!-- 流式回复 -->
+        <article class="msg assistant streaming">
+          <div class="msg-avatar"><span class="seal">玥</span></div>
+          <div class="msg-body">
+            <p class="msg-text">好的，已将称呼更新为 <em class="latin">Lumina</em>。下次唤醒我时，可以直接叫这个名字<span class="caret"></span></p>
+            <span class="msg-time">16:24</span>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="stream-fade top" aria-hidden="true"></div>
+      <div class="stream-fade bottom" aria-hidden="true"></div>
+    </aside>
+  </main>
+
+  <!-- ══════════ 设计稿演示控制 ══════════ -->
+  <div class="demo-bar" role="group" aria-label="状态演示">
+    <span class="demo-label">状态演示</span>
+    <button data-s="idle">待机</button>
+    <button data-s="listening">聆听</button>
+    <button data-s="thinking">思索</button>
+    <button data-s="speaking">应答</button>
+  </div>
+
+  <button class="anno-toggle" id="annoToggle" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="10" x2="12" y2="16.5"/><circle cx="12" cy="7.4" r="0.4" fill="currentColor"/></svg>
+    设计标注
+  </button>
+
+  <!-- 标注层（JS 渲染） -->
+  <div class="anno-layer" id="annoLayer" aria-hidden="true"></div>
+  <aside class="anno-panel" id="annoPanel" aria-hidden="true">
+    <h3>设计说明</h3>
+    <ol id="annoList"></ol>
+    <p class="anno-foot">配色取自「月夜 · 明珠」：深潭墨蓝为底，月光暖金为魂，青瓷冷绿为客。</p>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>

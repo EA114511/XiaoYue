@@ -1,0 +1,13 @@
+[project]
+name = "voice-assistant-mcp"
+version = "1.0.0"
+description = "MCP Server for AI Voice Assistant — exposes system management tools for LLM providers, voice providers, agents, skills, and settings"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.26.0",
+    "pydantic>=2.5.0",
+]
+
+[project.scripts]
+voice-mcp = "voice_assistant_mcp.server:main"
