@@ -77,31 +77,116 @@ npx cap open android
 
 ---
 
+## 配置签名（Keystore）
+
+### 首次构建：创建 Keystore
+
+**方式一：使用脚本自动创建（推荐）**
+
+**Windows**：
+```cmd
+cd voice-assistant\frontend\android
+create-keystore.bat
+```
+
+**Linux / Mac**：
+```bash
+cd voice-assistant/frontend/android
+./create-keystore.sh
+```
+
+按提示输入：
+- Keystore 密码（至少 6 位）
+- Key 密码（可与上面相同）
+- Key 别名（默认：xiaoyue）
+- 证书信息（可直接回车使用默认值）
+
+**方式二：手动创建**
+
+```bash
+cd voice-assistant/frontend/android
+
+# 创建 keystore
+keytool -genkey -v \
+    -keystore keystore/xiaoyue-release.jks \
+    -alias xiaoyue \
+    -keyalg RSA \
+    -keysize 2048 \
+    -validity 10000
+
+# 复制配置模板
+cp keystore.properties.template keystore.properties
+
+# 编辑 keystore.properties，填入实际密码
+```
+
+**方式三：Android Studio 创建**
+
+1. **Build → Generate Signed Bundle / APK**
+2. 点击 **Create new...**
+3. 填写信息并保存
+
+### 已有 Keystore：配置密码
+
+编辑 `frontend/android/keystore.properties`：
+
+```properties
+storeFile=keystore/xiaoyue-release.jks
+storePassword=你的keystore密码
+keyAlias=xiaoyue
+keyPassword=你的key密码
+```
+
+> ⚠️ **重要**：`keystore.properties` 包含敏感信息，已添加到 `.gitignore`，不会提交到 Git。
+
+---
+
 ## 生成签名 APK
 
-### 方式一：Android Studio 图形界面（推荐）
+### 方式一：一键构建脚本（推荐）
+
+**Windows**：
+```cmd
+cd voice-assistant\frontend\android
+build-apk.bat
+```
+
+**Linux / Mac**：
+```bash
+cd voice-assistant/frontend/android
+./build-apk.sh
+```
+
+脚本会自动：
+1. 检查 Java 和 Android SDK 环境
+2. 首次运行时引导创建 keystore
+3. 构建 Release APK
+
+### 方式二：Android Studio 图形界面
 
 1. 在 Android Studio 中打开 `frontend/android/`
 2. 等待 Gradle 同步完成
 3. 点击 **Build → Generate Signed Bundle / APK**
 4. 选择 **APK**，点击 Next
-5. 点击 **Create new...** 创建 keystore：
-   - Key store path：选择保存位置（如 `D:\keystore\xiaoyue.jks`）
-   - 设置密码并牢记
-   - 填写证书信息（CN=小玥）
-6. 选择 keystore 并输入密码
+5. 选择已创建的 keystore（或点击 **Create new...** 创建）
+6. 输入 keystore 密码和 key 密码
 7. 选择 **release** 构建类型
 8. 点击 **Finish**
 
 APK 输出位置：
 ```
-frontend/android/app/release/app-release.apk
+frontend/android/app/build/outputs/apk/release/app-release.apk
 ```
 
-### 方式二：命令行构建
+### 方式三：命令行构建
 
 ```bash
 cd frontend/android
+
+# Windows
+gradlew.bat assembleRelease
+
+# Linux / Mac
 ./gradlew assembleRelease
 ```
 

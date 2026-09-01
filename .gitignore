@@ -50,5 +50,10 @@ Thumbs.db
 # Docker
 *.pid
 
+# Android / Keystore
+**/keystore/*.jks
+**/keystore.properties
+!**/keystore.properties.template
+
 # Backup / Old versions (keep docs but ignore generated artifacts)
 _backup_original_frontend/
