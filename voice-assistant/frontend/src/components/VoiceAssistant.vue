@@ -21,7 +21,7 @@
         <p class="caption">{{ captionText }}</p>
 
         <div class="dock">
-          <button class="mic" :class="{ listening: orbState === 'listening' }" :disabled="status === 'processing'" @mousedown="onMicDown" @mouseup="onMicUp" @mouseleave="onMicUp" @touchstart.prevent="onMicDown" @touchend.prevent="onMicUp" aria-label="按住说话" title="长按录音">
+          <button class="mic" :class="{ listening: orbState === 'listening' }" :disabled="status === 'processing'" @mousedown="onMicDown" @mouseup="onMicUp" @mouseleave="onMicUp" @touchstart.prevent="onMicDown" @touchend.prevent="onMicUp" aria-label="按住说话，或说「小玥小玥」唤醒" title="按住说话，或说「小玥小玥」唤醒">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
               <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
@@ -37,7 +37,7 @@
             </svg>
           </button>
         </div>
-        <p class="dock-hint">按住 <kbd>空格</kbd> 说话，说完自动发送&ensp;·&ensp;<kbd>Enter</kbd> 发送文字</p>
+        <p class="dock-hint">说「小玥小玥」或按住 <kbd>空格</kbd> 说话，说完自动发送&ensp;·&ensp;<kbd>Enter</kbd> 发送文字</p>
       </section>
 
       <!-- 对话流 -->
@@ -112,8 +112,9 @@
  * - AI 语音回答后显示语音 pill，支持点击播放/暂停
  * - 底部输入框自动伸缩
  */
-import { ref, computed, nextTick, watch, onUnmounted } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { useVoiceChat } from '@/composables/useVoiceChat'
+import { useWakeWord } from '@/composables/useWakeWord'
 import OrbCanvas from '@/components/OrbCanvas.vue'
 import ConversationHistory from '@/components/ConversationHistory.vue'
 
@@ -157,6 +158,49 @@ const { isRecording, isProcessing, isPlaying, isStreamingResponse, status, trans
   onError(err) {
     console.error('[VoiceAssistant] 错误:', err)
     addMessage('assistant', `⚠️ ${err.message || '发生错误，请重试'}`)
+  }
+})
+
+// ============================================================
+// 唤醒词检测
+// ============================================================
+
+function playWakeSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.08)
+    gain.gain.setValueAtTime(0.08, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.15)
+    setTimeout(() => ctx.close().catch(() => {}), 200)
+  } catch {
+    // 提示音失败不影响主流程
+  }
+}
+
+const wakeWord = useWakeWord({
+  onWake: () => {
+    if (!isRecording.value && !isProcessing.value) {
+      playWakeSound()
+      isPressing = false
+      startRecording()
+    }
+  }
+})
+
+// 录音/处理期间暂停唤醒词监听，空闲时恢复
+watch([isRecording, isProcessing], ([recording, processing]) => {
+  if (recording || processing) {
+    wakeWord.stop()
+  } else {
+    wakeWord.resume()
   }
 })
 
@@ -348,7 +392,7 @@ const captionText = computed(() => {
     case 'speaking':
       return response.value || '正在为你朗读回答……'
     default:
-      return '轻触麦克风，或按住空格开始说话'
+      return '说「小玥小玥」唤醒我，或轻触麦克风开始说话'
   }
 })
 
@@ -371,8 +415,15 @@ function agentSeal(msg) {
 // 生命周期
 // ============================================================
 
+onMounted(() => {
+  if (wakeWord.isSupported()) {
+    wakeWord.start()
+  }
+})
+
 onUnmounted(() => {
   stopAllVoicePlay()
+  wakeWord.release()
   disconnect()
 })
 defineExpose({ clearMessages })

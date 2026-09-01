@@ -144,6 +144,20 @@ export function useVoiceChat(options = {}) {
   const vadOptions = options.vadOptions || {}
 
   // ============================================================
+  // Barge-in 内部状态（语音打断）
+  // ============================================================
+
+  /** @type {{ stop: () => void }|null} */
+  let bargeInAnalyser = null
+  /** @type {VADProcessor|null} */
+  let bargeInProcessor = null
+  /** 是否启用语音打断 */
+  const enableBargeIn = options.enableBargeIn !== false
+  /** 打断冷却时间（毫秒），防止误触发 */
+  const BARGE_IN_COOLDOWN_MS = 1500
+  let lastBargeInTime = 0
+
+  // ============================================================
   // Audio Queue — 顺序播放 TTS 音频
   // ============================================================
 
@@ -291,6 +305,7 @@ export function useVoiceChat(options = {}) {
   function disconnect() {
     intentionalClose = true
     cleanupVAD()
+    stopBargeInMonitor()
     clearTimeout(reconnectTimer)
     reconnectTimer = null
     stopHeartbeat()
@@ -489,6 +504,11 @@ export function useVoiceChat(options = {}) {
         if (!audioQueue) {
           audioQueue = new AudioQueue(playing => {
             isPlaying.value = playing
+            if (playing && enableBargeIn) {
+              monitorBargeIn()
+            } else {
+              stopBargeInMonitor()
+            }
           })
         }
         audioQueue.enqueue(audioData, header.format || 'mp3')
@@ -663,8 +683,82 @@ export function useVoiceChat(options = {}) {
     }
   }
 
+  // ============================================================
+  // Barge-in 语音打断
+  // ============================================================
+
+  /**
+   * 启动打断监听：TTS 播放期间监测用户说话，检测到语音立即打断
+   */
+  async function monitorBargeIn() {
+    if (!enableBargeIn || !isPlaying.value) return
+    if (Date.now() - lastBargeInTime < BARGE_IN_COOLDOWN_MS) return
+
+    try {
+      // 优先复用当前麦克风流；若无则新建低功耗流
+      const stream = mediaStream.value || (await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true
+        }
+      }))
+
+      bargeInProcessor = new VADProcessor({
+        speechThreshold: 0.025,
+        silenceTimeoutMs: 600,
+        minSpeechDurationMs: 200,
+        onSpeechStart: () => {
+          // 冷却期检查
+          if (Date.now() - lastBargeInTime < BARGE_IN_COOLDOWN_MS) return
+          if (!isPlaying.value) return
+
+          console.log('[useVoiceChat] 检测到用户说话，触发语音打断')
+          lastBargeInTime = Date.now()
+
+          // 立即停止 TTS 播放
+          if (audioQueue) {
+            audioQueue.stop()
+          }
+          isPlaying.value = false
+          onStatusChange('idle')
+
+          // 打断后免唤醒，直接开始录音
+          if (!isRecording.value && !isProcessing.value) {
+            startRecording()
+          }
+        }
+      })
+
+      bargeInAnalyser = createVADAnalyser(stream, bargeInProcessor, {
+        sampleRate: 16000,
+        intervalMs: 50
+      })
+    } catch (err) {
+      console.warn('[useVoiceChat] 打断监听初始化失败:', err)
+      bargeInProcessor = null
+      bargeInAnalyser = null
+    }
+  }
+
+  /**
+   * 停止打断监听
+   */
+  function stopBargeInMonitor() {
+    if (bargeInAnalyser) {
+      bargeInAnalyser.stop()
+      bargeInAnalyser = null
+    }
+    if (bargeInProcessor) {
+      bargeInProcessor.destroy()
+      bargeInProcessor = null
+    }
+  }
+
   function cleanupRecording() {
     cleanupVAD()
+    stopBargeInMonitor()
     if (mediaStream.value) {
       mediaStream.value.getTracks().forEach(t => t.stop())
       mediaStream.value = null
