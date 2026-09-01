@@ -8,7 +8,10 @@
       <div class="seal-logo">玥</div>
       <h1 class="app-title">小玥</h1>
       <button class="icon-btn" @click="goSettings" aria-label="设置">
-        <van-icon name="setting-o" size="22" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="settings-icon">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24" />
+        </svg>
       </button>
     </header>
 
@@ -205,12 +208,21 @@ onMounted(() => {
   place-items: center;
   color: var(--mist);
   border-radius: 10px;
+  border: 1px solid var(--hair-cool);
+  background: linear-gradient(160deg, rgba(27, 35, 64, 0.4), rgba(13, 18, 32, 0.3));
   transition: all 0.25s ease;
 }
 
 .icon-btn:active {
-  background: rgba(228, 181, 106, 0.1);
+  background: rgba(228, 181, 106, 0.15);
+  border-color: var(--hair-warm);
   color: var(--gold-2);
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
 }
 
 /* ---------- 主内容区 ---------- */

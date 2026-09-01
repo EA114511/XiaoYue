@@ -66,7 +66,33 @@ export const voiceApi = {
   getConversation: (id) => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/conversation/history/${id}`),
 
   // 删除对话
-  deleteConversation: (id) => api.delete(`${getBaseUrl()}${API_CONFIG.API_PATH}/conversation/history/${id}`)
+  deleteConversation: (id) => api.delete(`${getBaseUrl()}${API_CONFIG.API_PATH}/conversation/history/${id}`),
+
+  // 获取运行时配置
+  getSettings: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/settings`),
+
+  // 更新运行时配置
+  updateSettings: (settings) => api.post(`${getBaseUrl()}${API_CONFIG.API_PATH}/settings`, settings),
+
+  // ========== LLM Provider ==========
+  getProviders: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/providers`),
+  createProvider: (provider) => api.post(`${getBaseUrl()}${API_CONFIG.API_PATH}/providers`, provider),
+  updateProvider: (name, provider) => api.patch(`${getBaseUrl()}${API_CONFIG.API_PATH}/providers/${name}`, provider),
+  deleteProvider: (name) => api.delete(`${getBaseUrl()}${API_CONFIG.API_PATH}/providers/${name}`),
+
+  // ========== 语音 Provider ==========
+  getVoiceProviders: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/voice-providers`),
+  createVoiceProvider: (provider) => api.post(`${getBaseUrl()}${API_CONFIG.API_PATH}/voice-providers`, provider),
+  updateVoiceProvider: (name, provider) => api.patch(`${getBaseUrl()}${API_CONFIG.API_PATH}/voice-providers/${name}`, provider),
+  deleteVoiceProvider: (name) => api.delete(`${getBaseUrl()}${API_CONFIG.API_PATH}/voice-providers/${name}`),
+
+  // ========== 智能体 ==========
+  getAgents: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/agents`),
+  updateAgent: (name, config) => api.patch(`${getBaseUrl()}${API_CONFIG.API_PATH}/agents/${name}`, config),
+
+  // ========== 技能 ==========
+  getSkills: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/skills`),
+  getEnabledSkills: () => api.get(`${getBaseUrl()}${API_CONFIG.API_PATH}/skills/enabled`)
 }
 
 export default api
