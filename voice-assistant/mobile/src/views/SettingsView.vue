@@ -201,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores'
 import { voiceApi, setBaseUrl, setSessionApiToken, clearSessionApiToken } from '@/api'
@@ -237,6 +237,22 @@ const showAddVoiceProvider = ref(false)
 // 语音设置
 const bargeInEnabled = ref(true)
 const vadEnabled = ref(true)
+
+// 键盘事件处理
+function handleKeydown(e) {
+  if (e.key === 'Escape' && showAddProvider.value) {
+    showAddProvider.value = false
+    editingProvider.value = null
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 
 function goBack() {
   router.back()
@@ -338,14 +354,18 @@ onMounted(() => {
 <style scoped>
 .settings-view {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 /* ---------- 顶栏 ---------- */
 .top-bar {
   position: relative;
   z-index: 10;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -386,8 +406,12 @@ onMounted(() => {
 
 /* ---------- 设置内容 ---------- */
 .settings-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 16px 20px;
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
 }
 
 /* ---------- 未连接状态 ---------- */
@@ -650,6 +674,12 @@ onMounted(() => {
 }
 
 /* ---------- 弹窗 ---------- */
+:deep(.van-popup) {
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .popup-content {
   padding: 24px 20px;
   padding-bottom: calc(24px + env(safe-area-inset-bottom));
